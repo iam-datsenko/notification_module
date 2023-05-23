@@ -50,17 +50,14 @@ function App(): JSX.Element {
 
   const onPress = () => setColor(!color);
 
-  const sendIconToJava = async () => {
-    // const iconData = await RNFS.readFile('./icon.png', 'base64');
-    const result = await RNFS.readDir(RNFS.DocumentDirectoryPath);
-    const path = await RNFS.stat(result[0].path);
+  const convertToBase64 = async () => {
+    const byteArray = await RNFS.readFileRes('icon.png', 'base64');
 
-    console.log(result[0].path);
-    // setIcon(byteArray);
+    setIcon(byteArray);
   };
 
   useEffect(() => {
-    sendIconToJava();
+    convertToBase64();
   }, []);
 
   return (
@@ -77,7 +74,7 @@ function App(): JSX.Element {
         <Button
           title="press"
           onPress={async () => {
-            await RTNNotification?.show('header', 'message', onPress, '');
+            await RTNNotification?.show('header', 'message', onPress, icon);
           }}
         />
       </ScrollView>

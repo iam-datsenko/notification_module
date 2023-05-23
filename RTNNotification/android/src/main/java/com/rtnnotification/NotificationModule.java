@@ -22,6 +22,10 @@ import com.facebook.react.bridge.Callback;
 import android.net.Uri;
 import java.io.File;
 import android.content.res.Resources;
+import java.util.Base64;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import androidx.core.graphics.drawable.IconCompat;
 
 public class NotificationModule extends NativeNotificationSpec {
 
@@ -56,15 +60,14 @@ public class NotificationModule extends NativeNotificationSpec {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(myContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        int resourceId = myContext.getResources().getIdentifier(icon, "drawable", "com.notification");
+        // int resourceId = myContext.getResources().getIdentifier(icon, "drawable", "com.notification");
 
-        promise.resolve("id" + " " + resourceId);
-        promise.resolve(icon);
-        promise.resolve(R.drawable.notif_icon);
+        byte[] iconBytes = Base64.getDecoder().decode(icon);
+        Bitmap iconBitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+        IconCompat iconCompat = IconCompat.createWithBitmap(iconBitmap);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(myContext, "CHANNEL_ID")
-          // .setSmallIcon(icon)
-          .setSmallIcon(resourceId)
+          .setSmallIcon(iconCompat)
           // .setSmallIcon(R.drawable.notif_icon)
           .setContentTitle(header)
           .setContentText(message)
@@ -72,7 +75,7 @@ public class NotificationModule extends NativeNotificationSpec {
           .setContentIntent(pendingIntent)
           .setAutoCancel(true);
 
-        notificationManager.notify(123112, builder.build());
+        notificationManager.notify(777, builder.build());
 
         promise.resolve(header + " " + message);
       } else {

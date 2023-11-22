@@ -1,7 +1,7 @@
 {
   "name": "rtn-notification",
   "version": "0.0.1",
-  "description": "Show notification with Turbo Native Modules",
+  "description": "Add notifications with Turbo Native Modules",
   "react-native": "js/index",
   "source": "js/index",
   "files": [

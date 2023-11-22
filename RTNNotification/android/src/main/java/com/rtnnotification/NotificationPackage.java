@@ -17,30 +17,29 @@ public class NotificationPackage extends TurboReactPackage {
   @Nullable
   @Override
   public NativeModule getModule(String name, ReactApplicationContext reactContext) {
-    if (name.equals(NotificationModule.NAME)) {
-      return new NotificationModule(reactContext);
-    } else {
-      return null;
-    }
+      if (name.equals(NotificationModule.NAME)) {
+          return new NotificationModule(reactContext);
+      } else {
+          return null;
+      }
   }
 
   @Override
   public ReactModuleInfoProvider getReactModuleInfoProvider() {
-    return () -> {
-      final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
-        moduleInfos.put(
-        NotificationModule.NAME,
-        new ReactModuleInfo(
-          NotificationModule.NAME,
-          NotificationModule.NAME,
-          false, // canOverrideExistingModule
-          false, // needsEagerInit
-          true, // hasConstants
-          false, // isCxxModule
-          true // isTurboModule
-        ));
-
-      return moduleInfos;
-    };
+      return () -> {
+          final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
+          moduleInfos.put(
+                  NotificationModule.NAME,
+                  new ReactModuleInfo(
+                          NotificationModule.NAME,
+                          NotificationModule.NAME,
+                          false, // canOverrideExistingModule
+                          false, // needsEagerInit
+                          true, // hasConstants
+                          false, // isCxxModule
+                          true // isTurboModule
+          ));
+          return moduleInfos;
+      };
   }
 }

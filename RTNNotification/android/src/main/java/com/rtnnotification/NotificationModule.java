@@ -1,92 +1,58 @@
 package com.rtnnotification;
 
-import androidx.annotation.NonNull;
-import com.facebook.react.bridge.NativeModule;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import java.util.Map;
-import java.util.HashMap;
-import com.rtnnotification.NativeNotificationSpec;
-import androidx.core.app.NotificationCompat;
-import android.os.Build;
-import android.app.NotificationManager;
-import android.app.NotificationChannel;
-import androidx.core.app.NotificationManagerCompat;
-import android.content.Context;
-import android.content.Intent;
-import android.app.PendingIntent;
-import com.facebook.react.bridge.Callback;
-import android.net.Uri;
-import java.io.File;
-import android.content.res.Resources;
-import java.util.Base64;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import androidx.core.graphics.drawable.IconCompat;
 
-public class NotificationModule extends NativeNotificationSpec {
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
+
+import androidx.core.app.NotificationCompat;
+
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+
+public class NotificationModule extends ReactContextBaseJavaModule {
 
     public static String NAME = "RTNNotification";
 
     NotificationModule(ReactApplicationContext context) {
-      super(context);
+        super(context);
     }
 
     @Override
-    @NonNull
     public String getName() {
-      return NAME;
+        return NAME;
     }
 
-    @Override
-    public void show(String header, String message, Callback onPress, String icon, Promise promise) {
-      onPress.invoke();
+    @ReactMethod
+    public void showNotification(String title, String message) {
+        NotificationCompat.Builder builder =
+            new NotificationCompat.Builder(getReactApplicationContext(), "CHANNEL_ID")
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-      Context myContext = getReactApplicationContext();
-      NotificationManager notificationManager = myContext.getSystemService(NotificationManager.class);
+    NotificationManager notificationManager =
+        (NotificationManager) getReactApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-      if (notificationManager.areNotificationsEnabled()) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          int importance = NotificationManager.IMPORTANCE_DEFAULT;
-          NotificationChannel channel = new NotificationChannel("CHANNEL_ID", "channel_name", importance);
-          channel.setDescription("channel_description");
-          notificationManager.createNotificationChannel(channel);
-        }
-
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("myapp://news/today"));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(myContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        Intent snoozeIntent = new Intent(this, MyBroadcastReceiver.class);
-snoozeIntent.setAction(ACTION_SNOOZE);
-snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
-PendingIntent snoozePendingIntent =
-        PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
-
-        // int resourceId = myContext.getResources().getIdentifier(icon, "drawable", "com.notification");
-
-        byte[] iconBytes = Base64.getDecoder().decode(icon);
-        Bitmap iconBitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-        IconCompat iconCompat = IconCompat.createWithBitmap(iconBitmap);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(myContext, "CHANNEL_ID")
-          .setSmallIcon(iconCompat)
-          // .setSmallIcon(R.drawable.notif_icon)
-          .setContentTitle(header)
-          .setContentText(message)
-          .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-          .setContentIntent(pendingIntent)
-          .setAutoCancel(true)
-          .addAction(R.drawable.notif_icon, getString(R.string.snooze), snoozePendingIntent);
-
-        notificationManager.notify(777, builder.build());
-
-        promise.resolve(header + " " + message);
-      } else {
-        promise.resolve("No permission");
-      }
+    // Create a notification channel for Android 8.0 or higher
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      NotificationChannel channel =
+          new NotificationChannel(
+              "CHANNEL_ID",
+              "My Notification Channel",
+              NotificationManager.IMPORTANCE_DEFAULT);
+      channel.setDescription("My Notification Channel Description");
+      channel.enableLights(true);
+      channel.setLightColor(Color.GREEN);
+      notificationManager.createNotificationChannel(channel);
     }
+
+    notificationManager.notify(0, builder.build());
+  }
 }

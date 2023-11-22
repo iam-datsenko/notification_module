@@ -28,5 +28,5 @@ def core_version = "1.6.0"
 
 dependencies {
   implementation 'com.facebook.react:react-native'
-  implementation "androidx.core:core:$core_version"
+  implementation 'androidx.core:core:$core_version'
 }

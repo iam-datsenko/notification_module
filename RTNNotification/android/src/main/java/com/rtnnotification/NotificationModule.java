@@ -60,6 +60,12 @@ public class NotificationModule extends NativeNotificationSpec {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(myContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
+        Intent snoozeIntent = new Intent(this, MyBroadcastReceiver.class);
+snoozeIntent.setAction(ACTION_SNOOZE);
+snoozeIntent.putExtra(EXTRA_NOTIFICATION_ID, 0);
+PendingIntent snoozePendingIntent =
+        PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
+
         // int resourceId = myContext.getResources().getIdentifier(icon, "drawable", "com.notification");
 
         byte[] iconBytes = Base64.getDecoder().decode(icon);
@@ -73,7 +79,8 @@ public class NotificationModule extends NativeNotificationSpec {
           .setContentText(message)
           .setPriority(NotificationCompat.PRIORITY_DEFAULT)
           .setContentIntent(pendingIntent)
-          .setAutoCancel(true);
+          .setAutoCancel(true)
+          .addAction(R.drawable.notif_icon, getString(R.string.snooze), snoozePendingIntent);
 
         notificationManager.notify(777, builder.build());
 
